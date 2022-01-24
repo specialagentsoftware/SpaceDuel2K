@@ -6,13 +6,11 @@ using UnityEngine.SceneManagement;
 
 public class ShipController : MonoBehaviour
 {
-
     private Rigidbody rb;
     public HealthBar hb;
     public BoostBar bb;
     private float rotation = 0f;
     private float curVelocity = 0f;
-
     public LaserController lc;
     public float thrustMultiplyer = 300f;
     public float rotationSpeed = 150f;
@@ -22,9 +20,10 @@ public class ShipController : MonoBehaviour
     public float maxHealth = 100f;
     public float currHealth;
     public float currBoost;
-
+    public GameObject laserpoint;
     public Text velocity;
     private bool IsDeadControls = false;
+    private bool IsFiring = false;
 
     public ParticleSystem explosion;
     void Start()
@@ -95,7 +94,10 @@ public class ShipController : MonoBehaviour
 
         if (Input.GetKey(KeyCode.Space))
         {
-            StartCoroutine("Fire");
+            if (!IsFiring)
+            {
+                StartCoroutine("Fire");
+            }
         }
 
         if (curVelocity > maxVelocity)
@@ -135,15 +137,16 @@ public class ShipController : MonoBehaviour
 
     IEnumerator Fire()
     {
-        //lc.transform.Translate(gameObject.transform.position);
-        yield return new WaitForSeconds(5f);
-        Instantiate(lc, rb.transform.position, rb.rotation);
+        IsFiring = true;
+        Instantiate(lc, laserpoint.transform.position, rb.rotation);
+        yield return new WaitForSeconds(.1f);
+        IsFiring = false;
     }
 
     IEnumerator Death()
     {
         explosion.Play();
-        yield return new WaitForSeconds(1f);
+        yield return new WaitForSeconds(5f);
         Destroy(gameObject);
         SceneManager.LoadScene("MainScene");
     }
